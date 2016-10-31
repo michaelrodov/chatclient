@@ -5,7 +5,6 @@ import {xhttp} from 'xhttp';
 import * as Charts from './charts';
 
 
-
 export default class ChatWindow extends React.Component {
 
     constructor(props) {
@@ -25,42 +24,75 @@ export default class ChatWindow extends React.Component {
     componentDidMount() {
         this._fetchStatisticsScalars.bind(this);
         this._fetchStatisticsVectors.bind(this)
-        Charts.lineChartObject = Charts.generateLineChart([["mph",0,0,0],["wph",0,0,0]], "#lineChart");
+        Charts.lineChartObject = Charts.generateLineChart([["mph", 0, 0, 0], ["wph", 0, 0, 0]], "#lineChart");
+    }
+
+    componentDidUpdate() {
+        this.refs.msgList.scrollTop = this.refs.msgList.scrollHeight;
     }
 
     componentWillReceiveProps(newProps) {
-        let fetcherMsg = window.setInterval(this._fetchLatestMessages.bind(this), 2000, newProps.username);
-        let fetcherScalars = window.setInterval(this._fetchStatisticsScalars.bind(this), 60000);
-        let fetcherVectors = window.setInterval(this._fetchStatisticsVectors.bind(this), 10000);
-        //this.setState({fetcherId: fetcher, fetcherScalars: fetcherScalars, fetcherVectors: fetcherVectors});
+        if (newProps.username != this.props.username) {
+            // if (newProps.connection) {
+            //     let hub = this._setupHub(newProps.connection, newProps.username);
+            //     newProps.connection.start()
+            //         .done(function () {
+            //             console.log('Now connected, connection ID=' + newProps.connection.id);
+            //         })
+            //         .fail(function () {
+            //             console.error('Could not connect');
+            //         });
+            //     this.setState({hub: hub});
+            // }
+
+            window.setInterval(this._fetchLatestMessages.bind(this), 2000, newProps.username);
+            window.setInterval(this._fetchStatisticsScalars.bind(this), 2000);
+            window.setInterval(this._fetchStatisticsVectors.bind(this), 2000);
+
+        }
     }
 
 
     render() {
-
+        const st = {
+            fontSize: '10px'
+        };
         let messageList = this._buildMessageList();
         return (
             <div className="container--chat-page">
                 <div className="chat--header">
-                    <div className="container--statistic-scalars">
-                        <div className="--"><spa>Sec/Msg</spa><span></span></div>
+                    <div>
+                        <div className="container--statistic-scalars">
+                            <div><span>{this.state.avgLettersAllUsers}</span><span style={st}>Let/Msg</span></div>
+                            <div><span>{this.state.avgLettersPerUser}</span><span style={st}>Let/Msg ({this.props.username})</span></div>
+                                <div><span>{this.state.timeBetweenMsg}</span><span style={st}>Sec/Msg</span></div>
+                        </div>
                     </div>
                     <div id="lineChart" className="line-chart"></div>
                 </div>
-                <div className="container--list-messages">
+                <div className="container--username">{this.props.username}</div>
+                <div className="container--list-messages" ref="msgList">
                     {messageList}
-                    <div className="container--username">{this.props.username}</div>
                 </div>
                 <InputBar actionName="send"
                           placeholder="Type a message"
                           className="chat--input"
                           ref="messageInput"
-                          value=""
                           submitAction={this._addMessage.bind(this)}/>
             </div>
         );
     }
 
+
+    _setupHub(connection, hubname) {
+        let hub = connection.createHubProxy("chaturang");
+
+        connection.proxies.chaturang.on('Fetch', function (message) {
+            console.log("@MSG " + message);
+        });
+
+        return hub;
+    }
 
     /***
      * Adding a list of newely received messages to our current messages
@@ -95,7 +127,7 @@ export default class ChatWindow extends React.Component {
         slimMessage.TO = "";
 
         xhttp({
-                url: "http://"+this.props.apiUrl+"/api/messages/add",
+                url: "http://" + this.props.apiUrl + "/api/messages/add",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -105,8 +137,6 @@ export default class ChatWindow extends React.Component {
                 method: 'PUT'
             },
             (data, xhr) => {
-                this.refs.messageInput.value = "";
-                console.log("message: " + text + " was put.");
                 this._fetchLatestMessages(this.props.username); //update the message list
             },
             (err, xhr) => {
@@ -120,7 +150,7 @@ export default class ChatWindow extends React.Component {
      */
     _fetchLatestMessages(username) {
         xhttp({
-                url: "http://"+this.props.apiUrl+"/api/messages/get/afterid/" + this.state.latestId + "/user/" + username,
+                url: "http://" + this.props.apiUrl + "/api/messages/get/afterid/" + this.state.latestId + "/user/" + username,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -147,7 +177,7 @@ export default class ChatWindow extends React.Component {
         let self = this;
         this.state.messages.map(function (message, inx, origArr) {
             messageList.push(<Message text={message.TEXT}
-                                      from={message.FROM}
+                                      from={(message.FROM != self.props.username) ? message.FROM : ""}
                                       to={message.TO}
                                       mine={(self.props.username === message.FROM)}
                                       key={inx}/>)
@@ -155,9 +185,9 @@ export default class ChatWindow extends React.Component {
         return messageList;
     }
 
-    _fetchStatisticsScalars(){
+    _fetchStatisticsScalars() {
         xhttp({
-                url: "http://"+this.props.apiUrl+"/api/messages/statistics/scalars",
+                url: "http://" + this.props.apiUrl + "/api/messages/statistics/scalars",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -174,9 +204,10 @@ export default class ChatWindow extends React.Component {
                 console.error(xhr.responseURL, xhr.status, xhr.statusText);
             });
     }
-    _fetchStatisticsVectors(){
+
+    _fetchStatisticsVectors() {
         xhttp({
-                url: "http://"+this.props.apiUrl+"/api/messages/statistics/vectors?hours=5",
+                url: "http://" + this.props.apiUrl + "/api/messages/statistics/vectors?hours=5",
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',

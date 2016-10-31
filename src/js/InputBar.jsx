@@ -31,12 +31,16 @@ export default class InputBar extends React.Component {
                            ref="input"
                            onKeyDown={(typeof submit == "function") ? (event)=> {
                                if(event.keyCode==13){
+                                   this.refs.input.value="";
                                    submit(this.state.username);
                                }
                            } : () => {}}
                             onChange={this._updateInput.bind(this)}/>
                     <div className="button-submit"
-                         onClick={(typeof submit == "function") ? (event)=> {submit(this.state.username)} : () => {}}>
+                         onClick={(typeof submit == "function") ? (event)=> {
+                             this.refs.input.value="";
+                             submit(this.state.username)
+                         } : () => {}}>
                         {this.props.actionName}
                     </div>
                 </div>

@@ -26,7 +26,12 @@
 .container--chat-page > * {
     padding: 5px;
 }
-
+.container--statistic-scalars{
+    margin: 0 15px;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+}
 /**/
 .chat--header {
     line-height: 40px;
@@ -46,10 +51,18 @@
     flex-flow: column;
     overflow-y: scroll;
     overflow-x: hidden;
-
+    height: 100%;
     background-color: #fcfcf7;
+    position: relative;
 }
-
+.container--username{
+    position: absolute;
+    align-self: center;
+    font-size: 60px;
+    color: gainsboro;
+    top: 50%;
+    z-index: 100;
+}
 .container--input-bar {
     display: block;
     height: 40px;
@@ -143,7 +156,9 @@
     border-radius: 5px;
     box-shadow: 1px 1px 5px 0px gray;
 }
-
+.message-from{
+    font-size: 10px;
+}
 .mine-message > .message-text {
     float: right;
     background-color: lightblue;
