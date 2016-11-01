@@ -63,9 +63,9 @@ export default class ChatWindow extends React.Component {
                 <div className="chat--header">
                     <div>
                         <div className="container--statistic-scalars">
-                            <div><span>{this.state.avgLettersAllUsers}</span><span style={st}>Let/Msg</span></div>
-                            <div><span>{this.state.avgLettersPerUser}</span><span style={st}>Let/Msg ({this.props.username})</span></div>
-                                <div><span>{this.state.timeBetweenMsg}</span><span style={st}>Sec/Msg</span></div>
+                            <div><span>{this.state.avgLettersAllUsers.toPrecision(2)}</span><span style={st}>Let/Msg</span></div>
+                            <div><span>{this.state.avgLettersPerUser.toPrecision(2)}</span><span style={st}>Let/Msg ({this.props.username})</span></div>
+                                <div><span>{this.state.timeBetweenMsg.toPrecision(2)}</span><span style={st}>Sec/Msg</span></div>
                         </div>
                     </div>
                     <div id="lineChart" className="line-chart"></div>
@@ -179,6 +179,7 @@ export default class ChatWindow extends React.Component {
             messageList.push(<Message text={message.TEXT}
                                       from={(message.FROM != self.props.username) ? message.FROM : ""}
                                       to={message.TO}
+                                      sendtime={message.SENDTIME}
                                       mine={(self.props.username === message.FROM)}
                                       key={inx}/>)
         });
@@ -187,7 +188,7 @@ export default class ChatWindow extends React.Component {
 
     _fetchStatisticsScalars() {
         xhttp({
-                url: "http://" + this.props.apiUrl + "/api/messages/statistics/scalars",
+                url: "http://" + this.props.apiUrl + "/api/messages/statistics/scalars?username=" + this.props.username,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -220,7 +221,6 @@ export default class ChatWindow extends React.Component {
                 let wph = ["wph", ...data.wordsPerHourLastWeek]; //wordsPerHourLastWeek
                 let mph = ["mph", ...data.msgPerHourLastWeek]; //msgPerHourLastWeek
                 Charts.lineChartObject.load({columns: [wph, mph]});
-                console.log("vectors loaded");
             },
             (err, xhr) => {
                 console.error(xhr.responseURL, xhr.status, xhr.statusText);

@@ -158,6 +158,9 @@
 }
 .message-from{
     font-size: 10px;
+    display: inline-flex;
+    flex-flow: column;
+    justify-content: center;
 }
 .mine-message > .message-text {
     float: right;
@@ -169,4 +172,17 @@
     float: left;
     background-color: lightgreen;
     border: 1px solid #70B870;
+}
+.mine-message > .message-from {
+    float: right;
+    color: #7e7f8c;
+}
+
+.guest-message > .message-from {
+    float: left;
+    color: #7e7f8c;
+}
+.c3-tooltip-container{
+    background-color: black;
+    color: white;
 }

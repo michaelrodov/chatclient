@@ -21783,7 +21783,6 @@
 	                var wph = ["wph"].concat(_toConsumableArray(data.wordsPerHourLastWeek)); //wordsPerHourLastWeek
 	                var mph = ["mph"].concat(_toConsumableArray(data.msgPerHourLastWeek)); //msgPerHourLastWeek
 	                Charts.lineChartObject.load({ columns: [wph, mph] });
-	                console.log("vectors loaded");
 	            }, function (err, xhr) {
 	                console.error(xhr.responseURL, xhr.status, xhr.statusText);
 	            });
