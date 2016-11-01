@@ -9,8 +9,8 @@ import ChatApp from './ChatApp.jsx';
 //require('ms-signalr-client');
 //import 'ms-signalr-client';
 
- // var api = "chaturang-server.azurewebsites.net";
- var api = "localhost:34778";
+ var api = "chaturang-server.azurewebsites.net";
+ // var api = "localhost:34778";
 
 // var connection = $.hubConnection('http://' + settings.api);
 {/*var chathub = connection.createHubProxy("ChatHub");*/}
