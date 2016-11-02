@@ -3,6 +3,7 @@ import Message from './Message.jsx';
 import InputBar from './InputBar.jsx';
 import {xhttp} from 'xhttp';
 import * as Charts from './charts';
+import Loader from './Loader.jsx';
 
 
 export default class ChatWindow extends React.Component {
@@ -15,6 +16,7 @@ export default class ChatWindow extends React.Component {
             timeBetweenMsg: 0,
             avgLettersPerUser: 0,
             avgLettersAllUsers: 0,
+            loader: true,
             wph: ["wph"],
             mph: ["mph"],
 
@@ -58,6 +60,7 @@ export default class ChatWindow extends React.Component {
             fontSize: '10px'
         };
         let messageList = this._buildMessageList();
+        let loaderStatus = (this.props.username && this.props.username != "" && this.state.loader) ? "" : "hidden"
         return (
             <div className="container--chat-page">
                 <div className="chat--header">
@@ -74,6 +77,7 @@ export default class ChatWindow extends React.Component {
                 <div className="container--list-messages" ref="msgList">
                     {messageList}
                 </div>
+                <Loader hidden={loaderStatus}/>
                 <InputBar actionName="send"
                           placeholder="Type a message"
                           className="chat--input"
@@ -149,6 +153,7 @@ export default class ChatWindow extends React.Component {
      * @private
      */
     _fetchLatestMessages(username) {
+
         xhttp({
                 url: "http://" + this.props.apiUrl + "/api/messages/get/afterid/" + this.state.latestId + "/user/" + username,
                 headers: {
@@ -160,6 +165,7 @@ export default class ChatWindow extends React.Component {
             },
             (data, xhr) => {
                 this._addMessages(data);
+                this.setState({loader:false});
             },
             (err, xhr) => {
                 console.error(xhr.responseURL, xhr.status, xhr.statusText);
