@@ -6,6 +6,11 @@ export function generateLineChart(columns, bindto) {
         axis: {
             y: {
                 show: false
+            },
+            x: {
+                tick: {
+                    format: function (x) { return x + "h ago"; }
+                }
             }
         },
         legend: {
@@ -21,11 +26,7 @@ export function generateLineChart(columns, bindto) {
                 blue: '#a5c04d'
             },
             columns: columns,
-            type: 'bar',
-            axes: {
-                mph: 'y',
-                wph: 'y2'
-            }
+            type: 'bar'
         }
     });
 }
